@@ -61,5 +61,62 @@ describe('app routes', () => {
 
       expect(data.body).toEqual(expectation);
     });
+
+
+    test.only('posts/updates todos and gets them', async() => {
+
+      const expectation = [
+        {
+          'id': 4,
+          chore: 'clean kitchen',
+          completed: false,
+          'owner_id': 2
+        },
+        {
+          'id': 5,
+          chore: 'clean bedroom',
+          completed: false,
+          'owner_id': 2
+        },
+        {
+          'id': 6,
+          chore: 'clean garage',
+          completed: false,
+          'owner_id': 2
+        }
+      ];
+
+      await fakeRequest(app)
+        .post('/api/todos')
+        .send(expectation[0])
+        .set('Authorization', token)
+        .expect(200);
+
+      await fakeRequest(app)
+        .post('/api/todos')
+        .send(expectation[1])
+        .set('Authorization', token)
+        .expect(200);
+
+      await fakeRequest(app)
+        .post('/api/todos')
+        .send(expectation[2])
+        .set('Authorization', token)
+        .expect(200);
+
+
+      const data = await fakeRequest(app)
+        .get('/api/todos')
+        .set('Authorization', token)
+        .expect(200);
+
+      expect(data.body).toEqual(expectation);
+    });
+
+
+
   });
+
+
+
 });
