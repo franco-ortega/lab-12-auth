@@ -31,35 +31,86 @@ describe('app routes', () => {
       return client.end(done);
     });
 
-    test('returns animals', async() => {
+    test('posts/creates todos and gets them', async() => {
 
       const expectation = [
         {
-          'id': 1,
-          'name': 'bessie',
-          'coolfactor': 3,
-          'owner_id': 1
+          'id': 4,
+          chore: 'clean kitchen',
+          completed: false,
+          'owner_id': 2
         },
         {
-          'id': 2,
-          'name': 'jumpy',
-          'coolfactor': 4,
-          'owner_id': 1
+          'id': 5,
+          chore: 'clean bedroom',
+          completed: false,
+          'owner_id': 2
         },
         {
-          'id': 3,
-          'name': 'spot',
-          'coolfactor': 10,
-          'owner_id': 1
+          'id': 6,
+          chore: 'clean garage',
+          completed: false,
+          'owner_id': 2
+        }
+      ];
+
+      const testPost = await fakeRequest(app)
+        .post('/api/todos')
+        .send(expectation[0])
+        .set('Authorization', token)
+        .expect(200);
+
+      await fakeRequest(app)
+        .post('/api/todos')
+        .send(expectation[1])
+        .set('Authorization', token)
+        .expect(200);
+
+      await fakeRequest(app)
+        .post('/api/todos')
+        .send(expectation[2])
+        .set('Authorization', token)
+        .expect(200);
+
+
+      const data = await fakeRequest(app)
+        .get('/api/todos')
+        .set('Authorization', token)
+        .expect(200);
+
+      expect(data.body).toEqual(expectation);
+      expect(testPost.body).toEqual([{ 
+        'id': 4,
+        chore: 'clean kitchen',
+        completed: false,
+        'owner_id': 2
+
+      }]);
+    });
+
+    test('updates todos and gets them', async() => {
+
+      const expectation = [
+        {
+          'id': 4,
+          chore: 'clean kitchen',
+          completed: true,
+          'owner_id': 2
         }
       ];
 
       const data = await fakeRequest(app)
-        .get('/animals')
-        .expect('Content-Type', /json/)
+        .put('/api/todos/4')
+        .set('Authorization', token)
         .expect(200);
 
       expect(data.body).toEqual(expectation);
     });
+
+
+
   });
+
+
+
 });
